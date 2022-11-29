@@ -979,6 +979,12 @@ public class TranslateExprNodeVisitor extends AbstractReturningExprNodeVisitor<E
           codeGenerator);
     } else if (soyFunction instanceof ExternRef) {
       ExternRef ref = (ExternRef) soyFunction;
+      if (!variableMappings.has(ref.name())) {
+        // This extern doesn't have a jsimpl. An error has already been reported, but compilation
+        // hasn't been halted yet. Return a placeholder value to keep going until errors get
+        // reported.
+        return Expression.LITERAL_UNDEFINED;
+      }
       return variableMappings.get(ref.name()).call(visitChildren(node));
     } else {
       if (!(soyFunction instanceof SoyJsSrcFunction)) {
